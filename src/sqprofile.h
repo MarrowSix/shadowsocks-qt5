@@ -48,6 +48,12 @@ struct SQProfile
     QDateTime lastTime;//last time this connection is used
     QDate nextResetDate;//next scheduled date to reset data usage
     bool httpMode;
+    QString pathOfKcptunClient;
+    QString remoteaddr;
+    QString localaddr;
+    QString key;
+    QString crypt;
+    QString mode;
 
     static const int LATENCY_TIMEOUT = -1;
     static const int LATENCY_ERROR = -2;

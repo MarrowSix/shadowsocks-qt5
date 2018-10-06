@@ -40,6 +40,7 @@ private:
 
 private slots:
     void save();
+    void openKcptunClient();
 };
 
 #endif // EDITDIALOG_H

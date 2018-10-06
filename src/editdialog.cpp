@@ -3,6 +3,7 @@
 #include "ssvalidator.h"
 #include "ip4validator.h"
 #include "portvalidator.h"
+#include <QFileDialog>
 
 EditDialog::EditDialog(Connection *_connection, QWidget *parent) :
     QDialog(parent),
@@ -14,6 +15,13 @@ EditDialog::EditDialog(Connection *_connection, QWidget *parent) :
     /* initialisation and validator setup */
     static const QStringList supportedMethodList =
             SSValidator::supportedMethodList();
+    static QStringList supportCryptMethod = {
+        "aes", "aes-128", "aes-192", "salsa20", "blowfish", "twofish",
+        "cast5", "3des", "tea","xtea", "xor", "sm4", "none"
+    };
+    static QStringList supportMode = {
+        "fast", "fast3", "fast2", "normal", "manual"
+    };
     ui->encryptComboBox->addItems(supportedMethodList);
     IP4Validator *addrValidator = new IP4Validator(this);
     PortValidator *portValidator = new PortValidator(this);
@@ -35,8 +43,16 @@ EditDialog::EditDialog(Connection *_connection, QWidget *parent) :
     ui->resetDateEdit->setMinimumDate(QDate::currentDate());
     ui->autoStartCheckBox->setChecked(connection->profile.autoStart);
 
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &EditDialog::save);
+    ui->kcpclientLineEdit->setText(connection->profile.pathOfKcptunClient);
+    ui->remoteaddrLineEdit->setText(connection->profile.remoteaddr);
+    ui->keyLineEdit->setText(connection->profile.key);
+    ui->cryptComboBox->addItems(supportCryptMethod);
+    ui->cryptComboBox->setCurrentText(connection->profile.crypt);
+    ui->modeComboBox->addItems(supportMode);
+    ui->modeComboBox->setCurrentText(connection->profile.mode);
 
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &EditDialog::save);
+    connect(ui->openKcptunClient, &QPushButton::clicked, this, &EditDialog::openKcptunClient);
     this->adjustSize();
 }
 
@@ -58,6 +74,24 @@ void EditDialog::save()
     connection->profile.timeout = ui->timeoutSpinBox->value();
     connection->profile.nextResetDate = ui->resetDateEdit->date();
     connection->profile.autoStart = ui->autoStartCheckBox->isChecked();
+    connection->profile.pathOfKcptunClient = ui->kcpclientLineEdit->text();
+    connection->profile.remoteaddr = ui->remoteaddrLineEdit->text();
+    connection->profile.localaddr = QString(":").append(connection->profile.localPort);
+    connection->profile.key = ui->keyLineEdit->text().trimmed();
+    connection->profile.crypt = ui->cryptComboBox->currentText();
+    connection->profile.mode = ui->modeComboBox->currentIndex();
 
     this->accept();
+}
+
+void EditDialog::openKcptunClient()
+{
+    QString file = QFileDialog::getOpenFileName(
+                   this,
+                   tr("Import Kcptun Client Path"),
+                   QString(),
+                   "");
+    if (!file.isNull()) {
+        ui->kcpclientLineEdit->setText(file);
+    }
 }

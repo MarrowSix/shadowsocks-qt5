@@ -16,6 +16,12 @@ SQProfile::SQProfile()
     QDate currentDate = QDate::currentDate();
     nextResetDate = QDate(currentDate.year(), currentDate.month() + 1, 1);
     httpMode = false;
+    pathOfKcptunClient = QObject::tr("");
+    remoteaddr = "vps:29900";
+    localaddr = ":12948";
+    key = "it's a secrect";
+    crypt = "aes";
+    mode = "fast";
 }
 
 SQProfile::SQProfile(const QSS::Profile &profile) : SQProfile()
@@ -30,6 +36,12 @@ SQProfile::SQProfile(const QSS::Profile &profile) : SQProfile()
     timeout = profile.timeout();
     httpMode = profile.httpProxy();
     debug = profile.debug();
+    pathOfKcptunClient = QObject::tr("");
+    remoteaddr = "vps:29900";
+    localaddr = QString(":").append(localPort);
+    key = "it's a secrect";
+    crypt = "aes";
+    mode = "fast";
 }
 
 SQProfile::SQProfile(const QString &uri)
@@ -59,12 +71,14 @@ QSS::Profile SQProfile::toProfile() const
 
 QDataStream& operator << (QDataStream &out, const SQProfile &p)
 {
-    out << p.autoStart << p.debug << p.serverPort << p.localPort << p.name << p.serverAddress << p.localAddress << p.method << p.password << p.timeout << p.latency << p.currentUsage << p.totalUsage << p.lastTime << p.nextResetDate << p.httpMode;
+    out << p.autoStart << p.debug << p.serverPort << p.localPort << p.name << p.serverAddress << p.localAddress << p.method << p.password << p.timeout << p.latency << p.currentUsage << p.totalUsage << p.lastTime << p.nextResetDate << p.httpMode
+        << p.pathOfKcptunClient << p.remoteaddr << p.localaddr << p.key << p.crypt << p.mode;
     return out;
 }
 
 QDataStream& operator >> (QDataStream &in, SQProfile &p)
 {
-    in >> p.autoStart >> p.debug >> p.serverPort >> p.localPort >> p.name >> p.serverAddress >> p.localAddress >> p.method >> p.password >> p.timeout >> p.latency >> p.currentUsage >> p.totalUsage >> p.lastTime >> p.nextResetDate >> p.httpMode;
+    in >> p.autoStart >> p.debug >> p.serverPort >> p.localPort >> p.name >> p.serverAddress >> p.localAddress >> p.method >> p.password >> p.timeout >> p.latency >> p.currentUsage >> p.totalUsage >> p.lastTime >> p.nextResetDate >> p.httpMode
+       >> p.pathOfKcptunClient >> p.remoteaddr >> p.localaddr >> p.key >> p.crypt >> p.mode;
     return in;
 }
