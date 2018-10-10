@@ -22,6 +22,8 @@
 #include <QDataStream>
 #include <QDate>
 #include <QDateTime>
+#include <QString>
+#include <QStringList>
 #include <QtShadowsocks>
 
 struct SQProfile
@@ -31,6 +33,7 @@ struct SQProfile
     SQProfile(const QString& uri); // Construct it using ss protocol
 
     QSS::Profile toProfile() const; // Convert it into a QSS Profile
+    const QStringList& toArgument();
 
     bool autoStart;
     bool debug;
@@ -54,6 +57,7 @@ struct SQProfile
     QString key;
     QString crypt;
     QString mode;
+    QStringList kcpArgument;
 
     static const int LATENCY_TIMEOUT = -1;
     static const int LATENCY_ERROR = -2;

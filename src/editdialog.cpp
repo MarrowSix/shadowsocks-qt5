@@ -76,10 +76,10 @@ void EditDialog::save()
     connection->profile.autoStart = ui->autoStartCheckBox->isChecked();
     connection->profile.pathOfKcptunClient = ui->kcpclientLineEdit->text();
     connection->profile.remoteaddr = ui->remoteaddrLineEdit->text();
-    connection->profile.localaddr = QString(":").append(connection->profile.localPort);
+    connection->profile.localaddr = QString(":").append(QString::number(connection->profile.serverPort));
     connection->profile.key = ui->keyLineEdit->text().trimmed();
     connection->profile.crypt = ui->cryptComboBox->currentText();
-    connection->profile.mode = ui->modeComboBox->currentIndex();
+    connection->profile.mode = ui->modeComboBox->currentText();
 
     this->accept();
 }

@@ -20,6 +20,7 @@
 #define CONNECTION_H
 
 #include <QObject>
+#include <QProcess>
 #include <QtShadowsocks>
 #include <memory>
 #include "sqprofile.h"
@@ -58,6 +59,7 @@ private:
     std::unique_ptr<QSS::Controller> controller;
     SQProfile profile;
     bool running;
+    QProcess *kcpProcess;
 
     void testAddressLatency(const QHostAddress &addr);
 

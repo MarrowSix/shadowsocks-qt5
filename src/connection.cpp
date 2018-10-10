@@ -1,11 +1,13 @@
 #include "connection.h"
 #include "ssvalidator.h"
+#include <QFile>
 #include <QHostInfo>
 #include <QHostAddress>
 
 Connection::Connection(QObject *parent) :
     QObject(parent),
-    running(false)
+    running(false),
+    kcpProcess(nullptr)
 {}
 
 Connection::Connection(const SQProfile &_profile, QObject *parent) :
@@ -23,6 +25,8 @@ Connection::Connection(QString uri, QObject *parent) :
 Connection::~Connection()
 {
     stop();
+    if (!kcpProcess)
+        delete kcpProcess;
 }
 
 const SQProfile& Connection::getProfile() const
@@ -43,7 +47,9 @@ QByteArray Connection::getURI() const
 
 bool Connection::isValid() const
 {
-    if (profile.serverAddress.isEmpty() || profile.localAddress.isEmpty() || profile.timeout < 1 || !SSValidator::validateMethod(profile.method)) {
+    if (profile.serverAddress.isEmpty() || profile.localAddress.isEmpty() ||
+        profile.timeout < 1 || !SSValidator::validateMethod(profile.method) ||
+        !QFile::exists(profile.pathOfKcptunClient)) {
         return false;
     }
     else {
@@ -86,12 +92,27 @@ void Connection::start()
     if (!controller->start()) {
         emit startFailed();
     }
+
+    kcpProcess = new QProcess(this);
+    QStringList argument = profile.toArgument();
+
+    kcpProcess->start(profile.pathOfKcptunClient, argument);
+    kcpProcess->waitForStarted(300);
+
+    qDebug() << kcpProcess->state();
+    qDebug() << kcpProcess->arguments();
+    if (kcpProcess->state() == QProcess::NotRunning) {
+        emit startFailed();
+    }
+
 }
 
 void Connection::stop()
 {
     if (running) {
         controller.reset();
+        kcpProcess->close();
+        delete kcpProcess;
     }
 }
 

@@ -69,6 +69,16 @@ QSS::Profile SQProfile::toProfile() const
     return qssprofile;
 }
 
+const QStringList& SQProfile::toArgument()
+{
+    kcpArgument << QString("-r " + remoteaddr)
+                << QString("-l " + localaddr)
+                << QString("-key " + key)
+                << QString("-crypt " + crypt)
+                << QString("-mode " + mode);
+    return kcpArgument;
+}
+
 QDataStream& operator << (QDataStream &out, const SQProfile &p)
 {
     out << p.autoStart << p.debug << p.serverPort << p.localPort << p.name << p.serverAddress << p.localAddress << p.method << p.password << p.timeout << p.latency << p.currentUsage << p.totalUsage << p.lastTime << p.nextResetDate << p.httpMode
