@@ -54,6 +54,9 @@ signals:
 public slots:
     void start();
     void stop();
+    void processError(QProcess::ProcessError error);
+    void printStdoutLog();
+    void printStderrLog();
 
 private:
     std::unique_ptr<QSS::Controller> controller;

@@ -96,23 +96,74 @@ void Connection::start()
     kcpProcess = new QProcess(this);
     QStringList argument = profile.toArgument();
 
+    connect(kcpProcess, &QProcess::errorOccurred, this, &Connection::processError);
+    connect(kcpProcess, &QProcess::readyReadStandardOutput, this, &Connection::printStdoutLog);
+    connect(kcpProcess, &QProcess::readyReadStandardError, this, &Connection::printStderrLog);
+//    connect(kcpProcess, &QProcess::readyRead, this, &Connection::printStdoutLog);
+//    kcpProcess->setProgram(profile.pathOfKcptunClient);
+//    kcpProcess->setArguments(argument);
+//    kcpProcess->start();
     kcpProcess->start(profile.pathOfKcptunClient, argument);
-    kcpProcess->waitForStarted(300);
+    kcpProcess->waitForStarted();
 
     qDebug() << kcpProcess->state();
     qDebug() << kcpProcess->arguments();
     if (kcpProcess->state() == QProcess::NotRunning) {
         emit startFailed();
     }
-
 }
 
 void Connection::stop()
 {
     if (running) {
         controller.reset();
-        kcpProcess->close();
+        kcpProcess->kill();
         delete kcpProcess;
+    }
+}
+
+void Connection::processError(QProcess::ProcessError error)
+{
+    switch(error) {
+        case QProcess::FailedToStart:
+            qDebug() << "Kcptun Client FailedToStart";
+            break;
+        case QProcess::Crashed:
+            qDebug() << "Kcptun Client Creashed";
+            break;
+        case QProcess::Timedout:
+            qDebug() << "Kcptun Client Timeout";
+            break;
+        case QProcess::WriteError:
+            qDebug() << "Kcptun Client WriteError";
+            break;
+        case QProcess::ReadError:
+            qDebug() << "Kcptun Client ReadError";
+            break;
+        case QProcess::UnknownError:
+            qDebug() << "Kcptun Client UnknowError";
+            break;
+        default:
+            qDebug() << "Kcptun Client UnknowError";
+            break;
+    }
+}
+
+void Connection::printStdoutLog()
+{
+    QString result = kcpProcess->readAllStandardOutput();
+    QStringList tempResult = result.split('\n');
+    for (int i=0; i<tempResult.size(); i++) {
+        qDebug() << tempResult.at(i);
+    }
+}
+
+void Connection::printStderrLog()
+{
+    QString result = kcpProcess->readAllStandardError();
+    QStringList tempResult = result.split('\n');
+    for (int i=0; i<tempResult.size(); i++) {
+        qDebug() << tempResult.at(i);
     }
 }
 

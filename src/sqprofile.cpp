@@ -71,11 +71,12 @@ QSS::Profile SQProfile::toProfile() const
 
 const QStringList& SQProfile::toArgument()
 {
-    kcpArgument << QString("-r " + remoteaddr)
-                << QString("-l " + localaddr)
-                << QString("-key " + key)
-                << QString("-crypt " + crypt)
-                << QString("-mode " + mode);
+    kcpArgument.clear();
+    kcpArgument << QString("-r") << QString((!remoteaddr.isEmpty() ? remoteaddr : "vps:29900"))
+                << QString("-l") << QString((!localaddr.isEmpty() ? localaddr : ":12948"))
+                << QString("-key") << QString((!key.isEmpty() ? key : "it's a secrect"))
+                << QString("-crypt") << QString((!crypt.isEmpty() ? crypt : "aes"))
+                << QString("-mode") << QString((!mode.isEmpty() ? mode : "fast"));
     return kcpArgument;
 }
 
